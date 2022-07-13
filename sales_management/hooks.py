@@ -6,7 +6,7 @@ app_publisher = "Sales"
 app_description = "Sales"
 app_icon = "octicon octicon-file-directory"
 app_color = "grey"
-app_email = "hafeesk@gmail.com"
+app_email = "erpnexttech@gmail.com"
 app_license = "MIT"
 
 # Includes in <head>
