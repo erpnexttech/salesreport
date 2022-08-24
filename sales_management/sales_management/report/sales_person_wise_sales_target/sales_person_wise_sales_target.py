@@ -15,31 +15,23 @@ def execute(filters=None):
 
     totals = frappe._dict({})
     totals.update({
-        "indent": 0.0, "name": 'Grand Total', "parent_sales_person": '',
-        "sales_person": '', "opportunity": '', "customer_name": '', "territory": '',
-        "opportunity_details": '', "opportunity_amount": 0.0, "expected_closing": '',
+        "indent": 0.0, "name": 'Total', "parent_sales_person": '',
+        "sales_person": 'Total', "opportunity": '', "customer_name": '', "territory": '',
+        "opportunity_details": '',  "expected_closing": '',
         "status": '', "contact_by": '', "contact_date": '', "remarks": '',
-        "probability": 0, "total_sale": 0, "total_sale_opportunity": 0, "target": 0.0
+        "probability": 0, 
     })
 
-    """blank_totals = frappe._dict({})
-    blank_totals.update({
-                "indent": 0.0, "name":'', "parent_sales_person":'',
-                        "sales_person": '', "opportunity":'',"customer_name":'',"territory":'',
-                "opportunity_details":'',"opportunity_amount":0.0,"expected_closing":'',
-                "status":'',"contact_by":'',"contact_date":'',"remarks":'',
-                "probability":0,"total_sale":0,"total_sale_opportunity":0,"target":0.0
-
-
-                })
-
-    """
+    grand_total_sales_amount = 0
+    grand_total_oppor_value = 0
+    grand_total_sale_opportunity = 0
+    grand_total_sales_target = 0
     for sales_person in sales_persons:
         total_order = frappe.db.sql("""select sum(total) as total from `tabSales Order` so 
                                         inner join `tabSales Team` st
                                             on so.name = st.parent
                                         where st.sales_person = '%s' and so.docstatus = 1""" % sales_person.name, as_dict=1)
-        print(total_order)
+        
         if total_order:
             total_sale = total_order[0].total
         else:
@@ -47,6 +39,7 @@ def execute(filters=None):
 
         total = {
             "indent": 0.0, "is_parent": True,
+            'name':'Total',
             "parent_sales_person": "",
             "sales_person": sales_person.name,
             'target': sales_person.target,
@@ -62,7 +55,7 @@ def execute(filters=None):
 
                 temp.update({
                     "indent": 1.0,  "parent_sales_person": ss.sales_person, "sales_person": '', "opportunity": ss.name, "customer_name": ss.customer_name, "territory": ss.territory, "opportunity_details": ss.opportunity_details, "opportunity_amount": ss.opportunity_amount, "expected_closing": ss.expected_closing, "status": ss.status, "contact_by": ss.contact_by, "contact_date": ss.contact_date, "remarks": '',
-                    "probability": 0, "total_sale": 0, "total_sale_opportunity": 0, "target": 0.0,"probability":ss.probability
+                    "probability": 0, "total_sale": 0, "total_sale_opportunity": 0, "target": 0.0,"probability":ss.probability,'name':''
                 })
                 total_oppor_value = total_oppor_value + ss.opportunity_amount
                 
@@ -73,7 +66,17 @@ def execute(filters=None):
             'total_sale':total_oppor_value,
             'total_sale_opportunity':total_sale_opportunity
         })
-
+        grand_total_sales_amount = grand_total_sales_amount + total_sale
+        grand_total_oppor_value = grand_total_oppor_value + total_sale_opportunity
+        grand_total_sale_opportunity = grand_total_sale_opportunity + total_oppor_value
+        grand_total_sales_target = grand_total_sales_target + sales_person.target
+    totals.update({
+            'total_sale':grand_total_sale_opportunity,
+            'total_sale_opportunity':grand_total_oppor_value,
+            'sales_order_amount':grand_total_sales_amount,
+            'target':grand_total_sales_target
+        })
+    
     data.append(totals)
     return columns, data
 
@@ -100,7 +103,7 @@ def get_columns():
         {
         "fieldname": "customer_name",
         "label": "Client",
-        "width": 150,
+        "width": 200,
         "fieldtype": "Data"
     },
         {
@@ -169,8 +172,12 @@ def get_columns():
 
 
 def get_all_sales_person(filters):
+    cond = ''
+    if filters.sales_person:
+        cond = 'and name="%s"'%(filters.sales_person)
+
     sales_persons = frappe.db.sql(
-        """select name,total_target as target from `tabSales Person` where is_group = 0""", as_dict=1)
+        """select name,total_target as target from `tabSales Person` where is_group = 0 %s"""%cond, as_dict=1)
     return sales_persons
 
 

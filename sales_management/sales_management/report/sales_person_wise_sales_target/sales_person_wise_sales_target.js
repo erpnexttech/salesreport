@@ -12,18 +12,6 @@ frappe.query_reports["Sales Person Wise Sales Target"] = {
                         "default": frappe.defaults.get_user_default("Company")
                 },
 		{
-			"fieldname":"from_date",
-			"label": __("From Range"),
-			"fieldtype": "Date",
-			"reqd": 1
-		},
-		{
-                        "fieldname":"to_date",
-                        "label": __("To Range"),
-                        "fieldtype": "Date",
-                        "reqd": 1
-                },
-		{
 		        "fieldname":"sales_person",
                         "label": __("Sales Person"),
                         "fieldtype": "Link",
@@ -34,5 +22,16 @@ frappe.query_reports["Sales Person Wise Sales Target"] = {
 	"tree": true,
 	"parent_field": "parent_sales_person",
 	"name_field": "sales_person",
-	"initial_depth": 2
-};
+	"initial_depth": 2,
+	"formatter":function (value, row, column, data, default_formatter)  {
+ 	   	value = default_formatter(value, row, column, data);
+		
+		if (data.name == 'Total') {
+			value = $(`<span>${value}</span>`);
+			var $value = $(value).css("font-weight", "bold");
+			value = $value.wrap("<p></p>").parent().html();
+		}
+		return value;
+	}
+}
+
