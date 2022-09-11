@@ -15,17 +15,20 @@ def execute(filters=None):
     # Get the entire data from practitioner schedule table
 
     # Using the data read from table create our own row data sothat it matches with the dynamic column
+    client_dict = {}
     for d in cs_data:
-        row = {}
-
-        # Time duration in format HH::mm-HH:mm
+        """row = {}        
         row['time'] = d.appointment_time
         row['date'] = d.appointment_date
-        row[d.practitioner_name.lower().replace(' ','')] = d.patient_name
+        row[d.practitioner_name.lower().replace(' ','')] = d.patient_name"""
 
-        data.append(row)
+        if (d.appointment_date,d.appointment_time) in client_dict:
+            client_dict[(d.appointment_date,d.appointment_time)].update({d.practitioner_name.lower().replace(' ',''):d.patient_name})
+        else:
+            client_dict[(d.appointment_date,d.appointment_time)] = {'date':d.appointment_date,'time':d.appointment_time,d.practitioner_name.lower().replace(' ',''):d.patient_name}
 
-    return columns, data
+
+    return columns, list(client_dict.values())
 
 
 def get_columns(dictPractitioner):

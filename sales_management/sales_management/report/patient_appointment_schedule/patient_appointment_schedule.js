@@ -36,5 +36,10 @@ frappe.query_reports["Patient Appointment Schedule"] = {
           }
 
 	
-	]
+	],
+	onload: function(report) {
+		report.page.add_inner_button(__("Create Appointment"), function() {
+			frappe.set_route('Form', "Patient Appointment",'new-patient-appointment-1')
+		});
+	}
 };
