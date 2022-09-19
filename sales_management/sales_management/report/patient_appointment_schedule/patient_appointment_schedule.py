@@ -17,19 +17,13 @@ def execute(filters=None):
     # Using the data read from table create our own row data sothat it matches with the dynamic column
     client_dict = {}
     for slot_time in time_slot:
-        for d in cs_data:
-            """row = {}        
-            row['time'] = d.appointment_time
-            row['date'] = d.appointment_date
-            row[d.practitioner_name.lower().replace(' ','')] = d.patient_name"""
-
-            if slot_time == d.appointment_time:
-                if (d.appointment_date,d.appointment_time) in client_dict:
-                    client_dict[(d.appointment_date,d.appointment_time)].update({d.practitioner_name.lower().replace(' ',''):d.patient_name})
-                else:
-                    client_dict[(d.appointment_date,d.appointment_time)] = {'date':d.appointment_date,'time':d.appointment_time,d.practitioner_name.lower().replace(' ',''):d.patient_name}
-            else:
-                client_dict[(slot_time,d.appointment_date)] = {'date':d.appointment_date,'time':slot_time}
+        client_dict[(filters.from_date,str(slot_time))] = {'date':filters.from_date,'time':str(slot_time)}
+ 
+    for d in cs_data:
+        try:
+            client_dict[(str(d.appointment_date),str(d.appointment_time))].update({d.practitioner_name.lower().replace(' ',''):d.patient_name})
+        except:
+            pass
 
     return columns, list(client_dict.values())
 
@@ -60,7 +54,7 @@ def get_columns(dictPractitioner):
 
 
 def get_data(filters):
-    conditions = ' where company="%s" and appointment_date between "%s" and "%s"'%(filters.company,filters.from_date,filters.to_date)
+    conditions = ' where company="%s" and appointment_date between "%s" and "%s"'%(filters.company,filters.from_date,filters.from_date)
     if filters.practitioner:
         conditions += ' and practitioner = "%s"'%filters.practitioner
     time_slot = []

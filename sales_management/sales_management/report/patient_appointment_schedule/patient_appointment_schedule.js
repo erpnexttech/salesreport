@@ -15,18 +15,11 @@ frappe.query_reports["Patient Appointment Schedule"] = {
 	 {
 		"fieldname": "from_date",
 		"fieldtype": "Date",
-		"label": "From Date",
+		"label": "Date",
 		 "reqd":1,
 		 "default": frappe.datetime.get_today(),
 
   	  },
-	 {
-                "fieldname": "to_date",
-                "fieldtype": "Date",
-                "label": "To Date",
-		 "reqd":1,
-		 "default": frappe.datetime.get_today(),
-          },
 	   {
                 "fieldname": "practitioner",
                 "fieldtype": "Link",
