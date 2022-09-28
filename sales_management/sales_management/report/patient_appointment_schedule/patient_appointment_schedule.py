@@ -43,7 +43,13 @@ def get_columns(dictPractitioner):
     row['label'] = 'Time'
     row['width'] = '120'
     x.append(row)
-    for d in dictPractitioner:
+
+    doctors = []
+    all_practitioner = frappe.db.sql("""select practitioner_name from `tabHealthcare Practitioner`""",as_dict=1) 
+    for doctor in all_practitioner:
+        doctors.append(doctor.practitioner_name)
+
+    for d in doctors:
         row = {}
         row['fieldname'] = d.lower().replace(' ','')
         row['fieldtype'] = _('Data')
