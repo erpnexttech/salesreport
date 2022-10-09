@@ -45,7 +45,7 @@ def get_columns(dictPractitioner):
     x.append(row)
 
     doctors = []
-    all_practitioner = frappe.db.sql("""select practitioner_name from `tabHealthcare Practitioner`""",as_dict=1) 
+    all_practitioner = frappe.db.sql("""select practitioner_name from `tabHealthcare Practitioner` where status = 'Active'""",as_dict=1) 
     for doctor in all_practitioner:
         doctors.append(doctor.practitioner_name)
 
@@ -60,7 +60,7 @@ def get_columns(dictPractitioner):
 
 
 def get_data(filters):
-    conditions = ' where company="%s" and appointment_date between "%s" and "%s"'%(filters.company,filters.from_date,filters.from_date)
+    conditions = ' where status != "Cancelled" and company="%s" and appointment_date between "%s" and "%s"'%(filters.company,filters.from_date,filters.from_date)
     if filters.practitioner:
         conditions += ' and practitioner = "%s"'%filters.practitioner
     time_slot = []
