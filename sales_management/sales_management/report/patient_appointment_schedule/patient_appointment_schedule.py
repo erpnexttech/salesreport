@@ -27,7 +27,7 @@ def execute(filters=None):
                 client_dict[(str(d.appointment_date),str(start))].update({d.practitioner_name.lower().replace(' ',''):d.patient_name})
 
                 for slot in range(int(extra_slots-1)):
-                    end = start + datetime.timedelta(minutes=15)
+                    end = start + datetime.timedelta(minutes=30)
                     start = end
                     client_dict[(str(d.appointment_date),str(start))].update({d.practitioner_name.lower().replace(' ',''):d.patient_name})
             else:
