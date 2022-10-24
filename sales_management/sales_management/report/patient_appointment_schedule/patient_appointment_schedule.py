@@ -25,13 +25,15 @@ def execute(filters=None):
                 extra_slots = d.duration / 30
                 start = d.appointment_time
                 client_dict[(str(d.appointment_date),str(start))].update({d.practitioner_name.lower().replace(' ',''):d.patient_name})
-
+                client_dict[(str(d.appointment_date),str(start))].update({d.practitioner_name.lower().replace(' ','')+'_type':d.appointment_type})
                 for slot in range(int(extra_slots-1)):
                     end = start + datetime.timedelta(minutes=30)
                     start = end
                     client_dict[(str(d.appointment_date),str(start))].update({d.practitioner_name.lower().replace(' ',''):d.patient_name})
+                    client_dict[(str(d.appointment_date),str(start))].update({d.practitioner_name.lower().replace(' ','')+'_type':d.appointment_type})
             else:
                 client_dict[(str(d.appointment_date),str(d.appointment_time))].update({d.practitioner_name.lower().replace(' ',''):d.patient_name})
+                client_dict[(str(d.appointment_date),str(d.appointment_time))].update({d.practitioner_name.lower().replace(' ','')+'_type':d.appointment_type})
         except:
             pass
 
@@ -66,6 +68,14 @@ def get_columns(dictPractitioner):
         row['label'] = d
         row['width'] = '120'
         x.append(row)
+
+        row = {}
+        row['fieldname'] = d.lower().replace(' ','')+'_type'
+        row['fieldtype'] = _('Data')
+        row['label'] = 'Appointment Type'
+        row['width'] = '140'
+        x.append(row)
+
     return x
 
 
@@ -78,7 +88,7 @@ def get_data(filters):
     for slot in schedule:
         time_slot.append(slot.from_time)
 
-    data = frappe.db.sql("""select appointment_date, appointment_time,
+    data = frappe.db.sql("""select appointment_date, appointment_time,appointment_type,
                 patient_name, practitioner, practitioner_name,duration
                 from `tabPatient Appointment` %s order by appointment_date ASC"""%conditions,as_dict=1)
     
